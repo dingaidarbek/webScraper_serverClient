@@ -5,23 +5,6 @@ import os
 HOST = '127.0.0.1' 
 PORT = 65432      
 
-def create_query():
-    query = ET.Element('query')
-#Can modify conditions here
-    condition1 = ET.SubElement(query, 'condition')
-    column1 = ET.SubElement(condition1, 'column')
-    column1.text = 'Title'
-    value1 = ET.SubElement(condition1, 'value')
-    value1.text = 'Adjunct Assistant Professor'
-
-    condition2 = ET.SubElement(query, 'condition')
-    column2 = ET.SubElement(condition2, 'column')
-    column2.text = 'Name'
-    value2 = ET.SubElement(condition2, 'value')
-    value2.text = 'Fahed Jubair'
-
-    return ET.tostring(query, encoding='unicode')
-
 def read_query_from_file(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
@@ -67,35 +50,23 @@ def query_server(query_xml, save_to_file=False):
         display_response(response_xml)
 
 def main():
-    print("Choose an option:")
-    print("1. Create a new query dynamically")
-    print("2. Use an existing query from a file")
-    choice = input("Enter your choice (1 or 2): ")
-
-    if choice == '1':
-        query_xml = create_query()
-        query_server(query_xml, save_to_file=True)
-    elif choice == '2':
-        files = [f for f in os.listdir('.') if f.endswith('.xml')]
-        if not files:
-            print("No XML files found in the current folder.")
-            return
-        print("Available XML files:")
-        for i, file in enumerate(files):
-            print(f"{i + 1}. {file}")
-        file_choice = input("Enter the number of the file to use: ")
-        try:
-            file_index = int(file_choice) - 1
-            if 0 <= file_index < len(files):
-                query_xml = read_query_from_file(files[file_index])
-                if query_xml:
-                    query_server(query_xml, save_to_file=True)
-            else:
-                print("Invalid choice.")
-        except ValueError:
+    files = [f for f in os.listdir('.') if f.endswith('.xml')]
+    if not files:
+        print("No XML files found in the current folder.")
+        return
+    print("Available XML files:")
+    for i, file in enumerate(files):
+        print(f"{i + 1}. {file}")
+    file_choice = input("Enter the number of the file to use: ")
+    try:
+        file_index = int(file_choice) - 1
+        if 0 <= file_index < len(files):
+             query_xml = read_query_from_file(files[file_index])
+             if query_xml:
+              query_server(query_xml, save_to_file=True)
+        else:
+            print("Invalid choice.")
+    except ValueError:
             print("Invalid input. Please enter a number.")
-    else:
-        print("Invalid choice.")
-
 if __name__ == "__main__":
     main()
